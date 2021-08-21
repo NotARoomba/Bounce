@@ -20,8 +20,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RenderWindow.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="RenderWindow.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rect.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
