@@ -4,7 +4,7 @@
 
 class Text {
 public:
-	Text(SDL_Texture* tex_, float x_, float y_, float w_ = 32, float h_ = 32) {
+	Text(SDL_Texture* tex_, float x_, float y_, float w_, float h_) {
 		tex = tex_;
 		x = x_;
 		y = y_;
@@ -30,6 +30,12 @@ public:
 	}
 	SDL_Rect getCurrentFrame() {
 		return currentFrame;
+	}
+	void scale(float sx, float sy) {
+		x *= sx;
+		y *= sy;
+		currentFrame.w *= sx;
+		currentFrame.h *= sy;
 	}
 private:
 	float x, y;

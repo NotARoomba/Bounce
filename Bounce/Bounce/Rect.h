@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL.h>
-#include <ma>
 
 class Rect {
 public:
@@ -16,15 +15,27 @@ public:
 	float getY() {
 		return rect.y;
 	}
+	int getW() {
+		return rect.w;
+	}
+	int getH() {
+		return rect.h;
+	}
 	void setX(float x_) {
-		float rect.x = x_;
+		rect.x = x_;
 	}
 	void setY(float y_) {
-		float rect.y = y_;
+		rect.y = y_;
 	}
-	SDL_Rect* getRect() {
+	void scale(float sx, float sy) {
+		rect.x *= sx;
+		rect.y *= sy;
+		rect.w *= sx;
+		rect.h *= sy;
+	}
+	SDL_FRect* getRect() {
 		return &rect;
 	}
 private:
-	SDL_Rect rect;
+	SDL_FRect rect;
 };

@@ -7,7 +7,7 @@
 	class RenderWindow {
 	public:
 		RenderWindow(const char* title, int w, int h) {
-			window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+			window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		}
 		SDL_Texture* loadTexture(const char* filePath) {
@@ -33,8 +33,8 @@
 			SDL_RenderClear(renderer);
 			SDL_SetRenderDrawColor(renderer, 230, 230, 230, 255);
 		}
-		void renderRect(SDL_Rect* rect) {
-			SDL_RenderFillRect(renderer, rect);
+		void renderRect(SDL_FRect* rect) {
+			SDL_RenderFillRectF(renderer, rect);
 		}
 		void renderText(Text& text) {
 			SDL_Rect src, dst;
