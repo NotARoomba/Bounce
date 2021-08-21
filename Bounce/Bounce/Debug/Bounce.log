@@ -34,6 +34,6 @@ C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(30,50): warning C4
 C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(30,25): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(31,27): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(32,29): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(56,23): warning C4244: '=': conversion from 'Sint32' to 'float', possible loss of data
-C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(57,23): warning C4244: '=': conversion from 'Sint32' to 'float', possible loss of data
+C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(60,23): warning C4244: '=': conversion from 'Sint32' to 'float', possible loss of data
+C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Bounce\main.cpp(61,23): warning C4244: '=': conversion from 'Sint32' to 'float', possible loss of data
   Bounce.vcxproj -> C:\Users\kg5in\Documents\GitHub\Bounce\Bounce\Debug\Bounce.exe

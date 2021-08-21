@@ -9,7 +9,7 @@
 #include "Collision.h"
 using namespace std::this_thread;
 using namespace std::chrono;
-
+#undef main //why does this work????
 int main(int argc, char* argv[]) {
 
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -48,6 +48,10 @@ int main(int argc, char* argv[]) {
 				GameOver.scale(sx, sy);
 				P1Win.scale(sx, sy);
 				P2Win.scale(sx, sy);
+				P1Text.scale(sx, sy);
+				P2Text.scale(sx, sy);
+				ControlP1.scale(sx, sy);
+				ControlP2.scale(sx, sy);
 				Ball.scale(sx, sy);
 				P1.scale(sx, sy);
 				P2.scale(sx, sy);
