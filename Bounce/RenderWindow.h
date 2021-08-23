@@ -34,6 +34,14 @@
 			return t;
 				
 		}
+		Text loadText(std::string text, int x = 0, int y = 0, int size = 25) {
+			int w, h;
+			SDL_Texture* textTexture = loadFont("res/font/arial.ttf", text.c_str(), size);
+			SDL_QueryTexture(textTexture, NULL, NULL, &w, &h);
+			Text t(textTexture, center(x, w), center(y, h), w, h);
+			return t;
+
+		}
 		int center(int a, int b) {
 			return (a - b) / 2;
 		}
