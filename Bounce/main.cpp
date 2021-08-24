@@ -3,13 +3,12 @@
 #include <thread>
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <SDL_net.h>
 #include "RenderWindow.h"
 #include "Rect.h"
 #include "Text.h"
 #include "Collision.h"
 #include "Button.h"
-//#include "enet/enet.h"
+#include "enet/enet.h"
 
 using namespace std::this_thread;
 using namespace std::chrono;
@@ -18,9 +17,13 @@ int main(int argc, char* argv[]) {
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
-	SDLNet_Init();
-	IPaddress ip;
-	TCPsocket server = NULL, client = NULL;
+	enet_initialize();
+	ENetHost* client;
+	ENetHost* server;
+	client = enet_host_create(NULL, 1, 1, 0, 0);
+	ENetAddress address;
+	ENetPeer* peer;
+	address.port = 1298;
 	float osW = 1280.0f;
 	float osH = 720.0f;
 	float spdX = .1;
@@ -102,10 +105,6 @@ int main(int argc, char* argv[]) {
 				if (event.key.keysym.scancode == SDL_SCANCODE_S && P1.getY() <= (osH - P1.getH() + 2)) {
 					P1.setY(P1.getY() + 6);
 				}
-				SDLNet_TCP_Send(client, &P1, sizeof(P1));
-				SDLNet_TCP_Send(client, &P2, sizeof(P2));
-				SDLNet_TCP_Send(client, &Ball, sizeof(Ball));
-				SDLNet_TCP_Recv(server, &P2, sizeof(P2));
 				break;
 			case 3:
 				//client
@@ -115,10 +114,6 @@ int main(int argc, char* argv[]) {
 				if (event.key.keysym.scancode == SDL_SCANCODE_DOWN && P2.getY() <= (osH - P2.getH() - 2)) {
 					P2.setY(P2.getY() + 6);
 				}
-				SDLNet_TCP_Recv(client, &P1, sizeof(P1));
-				SDLNet_TCP_Recv(client, &P2, sizeof(P2));
-				SDLNet_TCP_Recv(client, &Ball, sizeof(Ball));
-				SDLNet_TCP_Send(server, &P2, sizeof(P2));
 				break;
 			case 4:
 				if (event.key.keysym.scancode == SDL_SCANCODE_W && P1.getY() >= 0) {
@@ -154,18 +149,12 @@ int main(int argc, char* argv[]) {
 				}
 				break;
 			case 7: {
-				const char* text = "accept";
-				SDLNet_ResolveHost(&ip, NULL, 1298);
-				server = SDLNet_TCP_Open(&ip);
-				while (1) {
-					client = SDLNet_TCP_Accept(server);
-					if (client != NULL) {
-						SDLNet_TCP_Send(client, text, strlen(text) + 1);
-						screen = 2;
-						break;
-					}
+				ENetEvent Eevent;
+				address.host = ENET_HOST_ANY;
+				server = enet_host_create(&address, 1, 1, 0, 0);
+				if (enet_host_service(server, &Eevent, 5000) > 0 && Eevent.type == ENET_EVENT_TYPE_RECEIVE) {
+					screen = 2;
 				}
-				
 			}
 				break;
 			case 8:
@@ -192,16 +181,13 @@ int main(int argc, char* argv[]) {
 					}
 				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_RETURN) {
+					ENetEvent Eevent;
 					SDL_StopTextInput();
-					char text[100];
-					SDLNet_ResolveHost(&ip, inputText.c_str(), 1298);
-					client = SDLNet_TCP_Open(&ip);
-					SDLNet_TCP_Recv(client, text, 100);
-					if (text[0] == 'a') {
+					enet_address_set_host(&address, inputText.c_str());
+					peer = enet_host_connect(client, &address, 1, 0);
+					if  (enet_host_service(client, &Eevent, 5000) > 0 && Eevent.type == ENET_EVENT_TYPE_CONNECT) {
+						window.sendPacket(peer, Ball);
 						screen = 2;
-					}
-					else {
-						screen = 6;
 					}
 				}
 				break;
@@ -350,23 +336,12 @@ int main(int argc, char* argv[]) {
 				Ip = window.loadText(inputText, osW, 800);
 				renderText = false;
             }
-			if (!client) {
 				window.renderText(IpText);
 				window.renderText(IpText2);
 				window.renderText(Ip);
-			}
-			else {
-				window.renderText(WaitForConnection);
-			}
 			break;
 		}
 		window.display();
-	}
-	if (client) {
-		SDLNet_TCP_Close(client);
-	}
-	if (server) {
-		SDLNet_TCP_Close(server);
 	}
 	window.clean();
 	SDL_Quit();

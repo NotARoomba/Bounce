@@ -4,6 +4,7 @@
 #include "Rect.h"
 #include "Text.h"
 #include "Button.h"
+#include "enet/enet.h"
 
 	class RenderWindow {
 	public:
@@ -44,6 +45,10 @@
 		}
 		int center(int a, int b) {
 			return (a - b) / 2;
+		}
+		void sendPacket(ENetPeer* peer, Rect rect) {
+			ENetPacket* packet = enet_packet_create(&rect, sizeof(rect) + 1, ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send(peer, 0, packet);
 		}
 		void clear(){
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
