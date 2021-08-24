@@ -32,8 +32,5 @@
     <ClInclude Include="Collision.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="Button.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

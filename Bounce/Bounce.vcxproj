@@ -149,7 +149,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Button.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="RenderWindow.h" />
