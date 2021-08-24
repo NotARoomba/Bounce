@@ -3,11 +3,8 @@
 #include <SDL_image.h>
 #include "Rect.h"
 #include "Text.h"
-<<<<<<< HEAD
 #include "Button.h"
 #include "enet/enet.h"
-=======
->>>>>>> parent of f5ece8e (Added singleplayer, main menu, and local multiplayer)
 
 	class RenderWindow {
 	public:
@@ -30,9 +27,9 @@
 			
 			return texture;
 		}
-		Text loadText(const char* text, int x = 0, int y = 0) {
+		Text loadText(const char* text, int x = 0, int y = 0, int size = 25) {
 			int w, h;
-			SDL_Texture* textTexture = loadFont("res/arial.ttf", text, 25);
+			SDL_Texture* textTexture = loadFont("res/font/arial.ttf", text, size);
 			SDL_QueryTexture(textTexture, NULL, NULL, &w, &h);
 			Text t(textTexture, center(x, w), center(y, h), w, h);
 			return t;
@@ -73,6 +70,18 @@
 			dst.h = text.getCurrentFrame().h;
 
 			SDL_RenderCopy(renderer, text.getTex(), &src, &dst);
+		}
+		void renderButton(Button& button) {
+			SDL_Rect src, dst;
+			src.x = 102 * button.getClip();
+			src.y = 0;
+			src.w = 102;
+			src.h = 52;
+			dst.x = button.getX();
+			dst.y = button.getY();
+			dst.w = button.getW();
+			dst.h = button.getH();
+			SDL_RenderCopy(renderer, button.getTex(), &src, &dst);
 		}
 		void display() {
 			SDL_RenderPresent(renderer);
