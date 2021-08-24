@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
 	Text P2Text = window.loadText("P2", osW * 2 - 50, 35);
 	Text P1Win = window.loadText("Player One Wins!", osW, 800);
 	Text P2Win = window.loadText("Player Two Wins!", osW, 800);
+	Text Github = window.loadText("github.com/NotARoomba/", osW, 1300, 17);
 	Text Bounce = window.loadText("Bounce", osW, 500);
 	Rect Ball(window.center(1280, 16), window.center(720, 16), 16, 16);
 	Rect P1(50, window.center(720, 96));
@@ -112,6 +113,7 @@ int main(int argc, char* argv[]) {
 				ControlP1.scale(sx, sy);
 				ControlP2.scale(sx, sy);
 				ControlEsc.scale(sx, sy);
+				Github.scale(sx, sy);
 				Ball.scale(sx, sy);
 				P1.scale(sx, sy);
 				P2.scale(sx, sy);
@@ -137,6 +139,7 @@ int main(int argc, char* argv[]) {
 			P2.setX(1214);
 			P2.setY(window.center(720, 96));
 			window.renderText(Bounce);
+			window.renderText(Github);
 			window.renderButton(Singleplayer);
 			window.renderButton(LocalMultiplayer);
 			window.renderButton(Instructions);
