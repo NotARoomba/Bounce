@@ -9,6 +9,8 @@
 #include "Text.h"
 #include "Collision.h"
 #include "Button.h"
+//#include "enet/enet.h"
+
 using namespace std::this_thread;
 using namespace std::chrono;
 #undef main //darn sdl main
@@ -18,8 +20,7 @@ int main(int argc, char* argv[]) {
 	TTF_Init();
 	SDLNet_Init();
 	IPaddress ip;
-	TCPsocket server = NULL;
-	TCPsocket client = NULL;
+	TCPsocket server = NULL, client = NULL;
 	float osW = 1280.0f;
 	float osH = 720.0f;
 	float spdX = .1;
@@ -70,13 +71,13 @@ int main(int argc, char* argv[]) {
 					screen = 1;
 				}
 				if (Multiplayer.buttonEvents(event)) {
-					screen = 5;
+					screen = 6;
 				}
 				if (LocalMultiplayer.buttonEvents(event) == true) {
-					screen = 3;
+					screen = 4;
 				}
 				if (Instructions.buttonEvents(event) == true) {
-					screen = 4;
+					screen = 5;
 				}
 				if (Quit.buttonEvents(event) == true) {
 					gameRunning = false;
@@ -94,8 +95,32 @@ int main(int argc, char* argv[]) {
 				}
 				break;
 			case 2:
+				//server
+				if (event.key.keysym.scancode == SDL_SCANCODE_W && P1.getY() >= 0) {
+					P1.setY(P1.getY() - 6);
+				}
+				if (event.key.keysym.scancode == SDL_SCANCODE_S && P1.getY() <= (osH - P1.getH() + 2)) {
+					P1.setY(P1.getY() + 6);
+				}
+				SDLNet_TCP_Send(client, &P1, sizeof(P1));
+				SDLNet_TCP_Send(client, &P2, sizeof(P2));
+				SDLNet_TCP_Send(client, &Ball, sizeof(Ball));
+				SDLNet_TCP_Recv(server, &P2, sizeof(P2));
 				break;
 			case 3:
+				//client
+				if (event.key.keysym.scancode == SDL_SCANCODE_UP && P2.getY() >= 0) {
+					P2.setY(P2.getY() - 6);
+				}
+				if (event.key.keysym.scancode == SDL_SCANCODE_DOWN && P2.getY() <= (osH - P2.getH() - 2)) {
+					P2.setY(P2.getY() + 6);
+				}
+				SDLNet_TCP_Recv(client, &P1, sizeof(P1));
+				SDLNet_TCP_Recv(client, &P2, sizeof(P2));
+				SDLNet_TCP_Recv(client, &Ball, sizeof(Ball));
+				SDLNet_TCP_Send(server, &P2, sizeof(P2));
+				break;
+			case 4:
 				if (event.key.keysym.scancode == SDL_SCANCODE_W && P1.getY() >= 0) {
 					P1.setY(P1.getY() - 6);
 				}
@@ -112,32 +137,38 @@ int main(int argc, char* argv[]) {
 					screen = 0;
 				}
 				break;
-			case 4:
+			case 5:
 				if (event.type == SDL_KEYDOWN) {
 					screen = 0;
 				}
 				break;
-			case 5:
+			case 6:
 				if (Host.buttonEvents(event) == true) {
-					screen = 6;
+					screen = 7;
 				}
 				if (Join.buttonEvents(event) == true) {
-					screen = 7;
+					screen = 8;
 				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 					screen = 0;
 				}
 				break;
-			case 6: {
-				server = SDLNet_TCP_Open(&ip);
+			case 7: {
+				const char* text = "accept";
 				SDLNet_ResolveHost(&ip, NULL, 1298);
-				client = SDLNet_TCP_Accept(server);
-				if (client) {
-					screen = 2;
+				server = SDLNet_TCP_Open(&ip);
+				while (1) {
+					client = SDLNet_TCP_Accept(server);
+					if (client != NULL) {
+						SDLNet_TCP_Send(client, text, strlen(text) + 1);
+						screen = 2;
+						break;
+					}
 				}
+				
 			}
 				break;
-			case 7:
+			case 8:
 				SDL_StartTextInput();
 				if (event.type == SDL_KEYDOWN) {
 					if (event.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0) {
@@ -162,16 +193,20 @@ int main(int argc, char* argv[]) {
 				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_RETURN) {
 					SDL_StopTextInput();
-					std::cout << inputText.c_str();
-					server = SDLNet_TCP_Open(&ip);
-					if(SDLNet_ResolveHost(&ip, inputText.c_str(), 1298));
-					client = SDLNet_TCP_Accept(server);
-					if (client) {
+					char text[100];
+					SDLNet_ResolveHost(&ip, inputText.c_str(), 1298);
+					client = SDLNet_TCP_Open(&ip);
+					SDLNet_TCP_Recv(client, text, 100);
+					if (text[0] == 'a') {
 						screen = 2;
+					}
+					else {
+						screen = 6;
 					}
 				}
 				break;
 			}
+			
 			
 			if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 				window.clear();
@@ -225,7 +260,8 @@ int main(int argc, char* argv[]) {
 			if (Ball.getY() >= P2.getY() && P2.getY() <= (osH - P2.getH() - 2)) {
 				P2.setY(P2.getY() + 6);
 			}
-		case 3:
+		case 2:
+		case 4:
 			if (collision(Ball, P1) || collision(Ball, P2)) {
 				spdX *= -1;
 			}
@@ -264,24 +300,52 @@ int main(int argc, char* argv[]) {
 			window.renderRect(P1.getRect());
 			window.renderRect(P2.getRect());
 			break;
-		case 2:
+		case 3:
+			if (Ball.getX() <= 0) {
+				window.clear();
+				window.renderText(GameOver);
+				window.renderText(P2Win);
+				window.display();
+				while (SDL_PollEvent(&event)) {
+					if (event.type == SDL_KEYDOWN) {
+						screen = 0;
+					}
+				}
+				break;
+			}
+			if (Ball.getX() >= osW) {
+				window.clear();
+				window.renderText(GameOver);
+				window.renderText(P1Win);
+				window.display();
+				while (SDL_PollEvent(&event)) {
+					if (event.type == SDL_KEYDOWN) {
+						screen = 0;
+					}
+				}
+			}
+			window.renderText(P1Text);
+			window.renderText(P2Text);
+			window.renderRect(Ball.getRect());
+			window.renderRect(P1.getRect());
+			window.renderRect(P2.getRect());
 			break;
-		case 4:
+		case 5:
 			window.renderText(Start);
 			window.renderText(ControlP1);
 			window.renderText(ControlP2);
 			window.renderText(ControlEsc);
 			break;
-		case 5:
+		case 6:
 			window.renderText(MultiplayerText);
 			window.renderText(Back);
 			window.renderButton(Host);
 			window.renderButton(Join);
 			break;
-		case 6:
+		case 7:
 			window.renderText(WaitForConnection);
 			break;
-		case 7:
+		case 8:
 			if(renderText) {
 				Ip = window.loadText(inputText, osW, 800);
 				renderText = false;
@@ -298,9 +362,11 @@ int main(int argc, char* argv[]) {
 		}
 		window.display();
 	}
-	SDLNet_TCP_Close(server);
 	if (client) {
 		SDLNet_TCP_Close(client);
+	}
+	if (server) {
+		SDLNet_TCP_Close(server);
 	}
 	window.clean();
 	SDL_Quit();
